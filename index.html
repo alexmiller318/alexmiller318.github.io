@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Untapped Potential & True Calling Quiz</title>
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0 }
+    body { font-family: Arial, sans-serif; background:#f5f7fa; color:#333; padding:1rem; max-width:900px; margin:auto }
+    h1 { text-align:center; color:#2c3e50; margin-bottom:1rem }
+    .question { background:#fff; border:1px solid #e1e4e8; border-radius:5px; padding:1rem; margin:0.75rem 0 }
+    .question p { margin-bottom:0.5rem }
+    .options { display:flex; gap:1rem; flex-wrap:wrap }
+    .options label { cursor:pointer; display:flex; align-items:center; user-select:none }
+    .options input { margin-right:0.3rem }
+    button { display:block; margin:2rem auto; padding:0.75rem 2rem; font-size:1rem; background:#2c3e50; color:#fff; border:none; border-radius:5px; cursor:pointer }
+    button:hover { background:#1a242f }
+    #results { background:#fff; border:1px solid #e1e4e8; border-radius:5px; padding:1.5rem; margin-top:2rem }
+    #results h2 { color:#2c3e50; margin-bottom:1rem }
+    #results ul { margin:0.5rem 0 1rem 1.2rem }
+  </style>
+</head>
+<body>
+  <h1>Untapped Potential & True Calling Quiz</h1>
+  <form id="quizForm"></form>
+  <button type="submit" form="quizForm">Submit & View Results</button>
+  <div id="results"></div>
+
+  <script>
+    const questions = [
+      {id:1,section:1,a:"Mid-meeting, someone suggests a radical shift—do you speak up immediately to debate it?",b:"Do you wait until after the meeting to send a carefully worded email with your thoughts?"},
+      {id:2,section:1,a:"A neighbor at a block party strikes up a long conversation—do you keep chatting?",b:"Do you politely excuse yourself for some alone time?"},
+      {id:3,section:1,a:"Your calendar fills with social invites—do you RSVP yes to them all?",b:"Do you selectively pick a couple and decline the rest to recharge?"},
+      {id:4,section:1,a:"In a brainstorming session you blurt out the first idea that comes to mind—does that energize you?",b:"Do you prefer to listen, refine ideas mentally, then share?"},
+      {id:5,section:1,a:"A friend is upset—do you immediately offer a hug and talk it out?",b:"Do you give them space and follow up later one-on-one?"},
+      {id:6,section:1,a:"You see a crisis on Slack—do you jump in to coordinate a quick group fix?",b:"Do you quietly fix it yourself then message the summary privately?"},
+      {id:7,section:1,a:"Given a choice of tasks, do you gravitate toward those letting you self-start and lead?",b:"Do you choose detailed instructions with clear steps to follow?"},
+      {id:8,section:1,a:"Your desk is spotless—do you feel frustrated if it gets cluttered?",b:"Do you not mind the mess so long as you can find what you need?"},
+      {id:9,section:1,a:"A wild new project idea excites you—do you pursue it even if it’s untested?",b:"Do you do more research first to ensure it’s worth your time?"},
+      {id:10,section:1,a:"At a party you love being in the center of the action—does that fuel you?",b:"Or do you gravitate to a quiet corner for deeper one-on-one talks?"},
+      {id:11,section:1,a:"You’re given a blank canvas—do you fill it with bold, experimental designs?",b:"Do you sketch carefully planned elements?"},
+      {id:12,section:1,a:"When someone disagrees with you, do you challenge them head-on?",b:"Do you take it as feedback and reflect quietly?"},
+      {id:13,section:1,a:"You’re juggling many deadlines—do you love the rush of cross-checking as you go?",b:"Do you prefer to lock in one task at a time until it’s done?"},
+      {id:14,section:1,a:"Criticism stings—do you replay it over and over?",b:"Do you mentally note it and move on quickly?"},
+      {id:15,section:1,a:"A sales pitch gets you pumped—do you take the mic to share your own pitch?",b:"Do you prefer to let someone else handle the front stage?"},
+      {id:16,section:1,a:"Team conflict arises—do you dive into the middle to mediate?",b:"Do you address each person privately to calm things down?"},
+      {id:17,section:1,a:"You have an idea you think is crazy—do you voice it immediately?",b:"Do you wait until you’ve refined it first?"},
+      {id:18,section:1,a:"Your inbox explodes—do you blast through every message now?",b:"Do you batch them and respond strategically later?"},
+      {id:19,section:1,a:"You love philosophical debates—do you hunt down strangers to discuss theories?",b:"Do you journal those debates privately first?"},
+      {id:20,section:1,a:"An impromptu karaoke session starts—do you grab the mic and belt out a song?",b:"Do you watch from the sidelines, enjoying the show?"},
+      {id:21,section:1,a:"You notice a tiny protocol loophole—do you call it out publicly?",b:"Do you fix it quietly in the system?"},
+      {id:22,section:1,a:"Given a social media post, do you comment first to engage?",b:"Do you read others’ comments before jumping in?"},
+      {id:23,section:1,a:"You’re stressed about a big presentation—do you rehearse in front of colleagues?",b:"Do you practice alone until you’re confident?"},
+      {id:24,section:1,a:"A rumor swirls around the office—do you confront the source head-on?",b:"Do you gather facts privately before addressing it?"},
+      {id:25,section:1,a:"Your schedule frees up unexpectedly—do you call an impromptu meetup?",b:"Do you savor the free time for yourself?"},
+      {id:26,section:1,a:"You’re given a captivating book—do you read it cover-to-cover in one sitting?",b:"Do you savor it a chapter at a time?"},
+      {id:27,section:1,a:"You spot a broken coffee machine—do you loudly request a fix?",b:"Do you quietly brew in the kitchenette?"},
+      {id:28,section:1,a:"You’re up for an improv challenge—do you jump in with wild ideas?",b:"Do you wait for your cue carefully?"},
+      {id:29,section:1,a:"You’re praised unexpectedly—do you share the spotlight?",b:"Do you credit your team privately?"},
+      {id:30,section:1,a:"Your mind races at night—do you jot down every thought immediately?",b:"Do you wait until morning to reflect?"},
+      {id:31,section:2,a:"At a community build day, do you wield the hammer and nail yourself?",b:"Do you coordinate volunteers and assign tasks?"},
+      {id:32,section:2,a:"You’re given a dataset on wildlife sightings—do you jump into code to analyze it?",b:"Do you interview local guides first for their observations?"},
+      {id:33,section:2,a:"A sculpture workshop opens—do you mold clay with your hands?",b:"Do you sketch the design digitally first?"},
+      {id:34,section:2,a:"You’re offered to teach a beginner’s coding class—do you explain algorithms on stage?",b:"Do you write the curriculum and let assistants teach?"},
+      {id:35,section:2,a:"An R&D lab has a mystery sample—do you perform hands-on experiments?",b:"Do you review the literature before touching a pipette?"},
+      {id:36,section:2,a:"A blank canvas sits before you—do you paint freely by intuition?",b:"Do you draft a precise layout in pencil first?"},
+      {id:37,section:2,a:"You need to clean a chemical spill—do you suit up and scrub the floor yourself?",b:"Do you call the cleanup crew and supervise?"},
+      {id:38,section:2,a:"Your startup needs brand colors—do you mix paint swatches physically?",b:"Do you fine-tune them in Photoshop first?"},
+      {id:39,section:2,a:"You spot a grammar error in a report—do you correct it on the PDF directly?",b:"Do you send back notes on a style guide?"},
+      {id:40,section:2,a:"You’re designing a survey—do you build the flowchart yourself?",b:"Do you deploy a survey tool and adjust settings?"},
+      {id:41,section:2,a:"A workshop invites you to facilitate—do you lead group dynamics exercises?",b:"Do you prepare written handouts and resources?"},
+      {id:42,section:2,a:"Your friend needs emotional support—do you sit face-to-face and listen?",b:"Do you text them a thoughtful guide?"},
+      {id:43,section:2,a:"A pitch meeting looms—do you stand up front and present?",b:"Do you prepare a detailed slide deck for someone else to present?"},
+      {id:44,section:2,a:"You want to start a side business—do you cold-call prospects yourself?",b:"Do you craft templated emails and automate outreach?"},
+      {id:45,section:2,a:"You need to organize event RSVPs—do you code a custom database?",b:"Do you use a spreadsheet and filters?"},
+      {id:46,section:2,a:"Your team follows a strict protocol—do you document every rule meticulously?",b:"Do you train them through live demos?"},
+      {id:47,section:2,a:"A compliance audit arrives—do you pore over every line of code?",b:"Do you assign specialists to each module and oversee?"},
+      {id:48,section:2,a:"You manage inventory—do you physically count items on shelves?",b:"Do you update the digital logs remotely?"},
+      {id:49,section:3,a:"A crisis erupts—are you the voice rallying everyone to a bold new plan?",b:"Are you the hands-on fixer who jumps in to resolve it?"},
+      {id:50,section:3,a:"Your company needs new features—do you pitch a radical innovation to leadership?",b:"Do you refine existing features for reliability?"},
+      {id:51,section:3,a:"You see a collaboration opportunity—do you gather a cross-functional team to brainstorm?",b:"Do you work solo to prototype a proof of concept first?"},
+      {id:52,section:3,a:"Given a blank design brief—do you sketch 50 wild concepts?",b:"Do you research and deliver 5 polished mockups?"},
+      {id:53,section:3,a:"A friend is stuck creatively—do you host a jam session to spark ideas?",b:"Do you send them a step-by-step tutorial to guide them?"},
+      {id:54,section:3,a:"Your boss needs you to lead—do you grab the mic and speak confidently?",b:"Do you coordinate quietly behind the scenes to get it done?"},
+      {id:55,section:3,a:"A new department forms—do you volunteer to chair the kickoff meeting?",b:"Do you volunteer to draft the charter and process docs?"},
+      {id:56,section:3,a:"Your team needs vision—do you present a future roadmap to inspire?",b:"Do you detail the next sprint tasks so everyone knows exactly what to do?"},
+      {id:57,section:3,a:"You need to win buy-in—do you craft a stirring keynote?",b:"Do you prepare a data-driven report to demonstrate ROI?"},
+      {id:58,section:3,a:"You’re energized by mass feedback—do you host a live feedback session?",b:"Do you send a survey to collect structured responses?"},
+      {id:59,section:3,a:"An ambiguous problem arises—do you propose a bold hypothesis to test?",b:"Do you collect more data before deciding?"},
+      {id:60,section:3,a:"Your product needs a facelift—do you tear down the entire UI for a fresh look?",b:"Do you tweak existing components for consistency?"},
+      {id:61,section:3,a:"The team is divided—do you lead a spirited debate to find consensus?",b:"Do you quietly mediate one-on-one to resolve it?"},
+      {id:62,section:3,a:"You spot an inefficiency—do you pitch a dramatic new workflow?",b:"Do you improve the current workflow incrementally?"},
+      {id:63,section:3,a:"Your highest priority is impact—do you push for a big launch quickly?",b:"Do you refine the product until it’s near perfection?"},
+      {id:64,section:3,a:"You love high-stakes presentations—do you volunteer first to lead them?",b:"Do you prefer to craft the slides and let someone else present?"},
+      {id:65,section:3,a:"Your team needs energy—do you organize a creative offsite with bold activities?",b:"Do you plan a structured workshop with clear objectives?"},
+      {id:66,section:3,a:"Ambiguity doesn’t scare you—do you jump in to chart unknown territory?",b:"Do you map out every parameter before proceeding?"},
+      {id:67,section:3,a:"You thrive in the spotlight—do you host the customer demo live?",b:"Do you draft the demo script and let the sales team handle it?"},
+      {id:68,section:3,a:"You want to shape culture—do you deliver a keynote on company values?",b:"Do you write the culture playbook for the leadership team?"},
+      {id:69,section:4,a:"Your project stalls—are you driven by the fear of it failing outright?",b:"Or by the fear of losing control over the details?"},
+      {id:70,section:4,a:"A promotion is announced—do you crave the recognition that comes with it?",b:"Or the security of a stable role it provides?"},
+      {id:71,section:4,a:"Given a complex puzzle, do you want to understand every layer of how it works?",b:"Or rush to implement a practical solution now?"},
+      {id:72,section:4,a:"Your boss asks for your vision—do you propose a completely new direction?",b:"Or recommend optimizations to the existing roadmap?"},
+      {id:73,section:4,a:"You lead best when you have autonomy—do you seek projects with zero oversight?",b:"Or when you collaborate closely with stakeholders?"},
+      {id:74,section:4,a:"To feel secure, do you need airtight logic in every plan?",b:"Or a strong emotional rapport with your team?"},
+      {id:75,section:4,a:"You energize at intellectual debates—do you seek roles demanding creative problem-solving?",b:"Or ones rewarding dependable execution?"},
+      {id:76,section:4,a:"You aim to rally people around a bold dream—do you call them to your vision?",b:"Or support them with steady guidance?"},
+      {id:77,section:4,a:"Your goal is transformational change—do you lead a major restructuring?",b:"Or maintain and improve the current system?"},
+      {id:78,section:4,a:"You find purpose in uncovering hidden problems—do you dig into root-cause analysis?",b:"Or in facilitating others to succeed?"},
+      {id:79,section:4,a:"You’re compelled to pioneer untested ideas—do you join a greenfield startup?",b:"Or to optimize established processes at a large firm?"},
+      {id:80,section:4,a:"You long to leave a unique mark—do you craft your own path?",b:"Or build success as part of a cohesive team?"}
+    ];
+
+    const form = document.getElementById('quizForm');
+    questions.forEach(q => {
+      const div = document.createElement('div');
+      div.className = 'question';
+      div.innerHTML = `
+        <p><strong>Q${q.id}:</strong> A) ${q.a}<br/>B) ${q.b}</p>
+        <div class="options">
+          <label><input type="radio" name="q${q.id}" value="A">A</label>
+          <label><input type="radio" name="q${q.id}" value="B">B</label>
+        </div>`;
+      form.appendChild(div);
+    });
+
+    const buckets = {1:[],2:[],3:[],4:[]};
+    questions.forEach(q => buckets[q.section].push(q.id));
+    function getAns(id) { const el = document.querySelector(`input[name="q${id}"]:checked`); return el ? el.value : null; }
+    document.getElementById('quizForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const res = {big:{E:0,A:0,C:0,N:0,O:0},ria:{R:0,I:0,A:0,S:0,E:0,C:0},str:{A:0,B:0},mot:{A:0,B:0}};
+      ["E","A","C","N","O"].forEach((d,i) => buckets[1].slice(i*6,(i+1)*6).forEach(id => { if(getAns(id)==="A") res.big[d]++; }));
+      ["R","I","A","S","E","C"].forEach((d,i) => buckets[2].slice(i*3,(i+1)*3).forEach(id => { if(getAns(id)==="A") res.ria[d]++; }));
+      buckets[3].forEach(id => { const v = getAns(id); if(v) res.str[v]++; });
+      buckets[4].forEach(id => { const v = getAns(id); if(v) res.mot[v]++; });
+      let out = "<h2>Your Results</h2><h3>Big Five</h3><ul>";
+      out += `<li>Extraversion: ${res.big.E}/6</li><li>Agreeableness: ${res.big.A}/6</li>`;
+      out += `<li>Conscientiousness: ${res.big.C}/6</li><li>Neuroticism: ${res.big.N}/6</li>`;
+      out += `<li>Openness: ${res.big.O}/6</li></ul><h3>Top RIASEC</h3><ul>`;
+      Object.entries(res.ria).sort((a,b) => b[1]-a[1]).slice(0,2).forEach(([k,v]) => out += `<li>${k}: ${v}/3</li>`);
+      out += "</ul><h3>Strengths</h3><p>A:" + res.str.A + " vs B:" + res.str.B + "</p>";
+      out += "<h3>Motivations</h3><p>A:" + res.mot.A + " vs B:" + res.mot.B + "</p>";
+      document.getElementById('results').innerHTML = out;
+      window.scrollTo(0,document.body.scrollHeight);
+    });
+  </script>
+</body>
+</html>
