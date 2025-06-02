@@ -18,6 +18,9 @@
     #results { background:#fff; border:1px solid #e1e4e8; border-radius:5px; padding:1.5rem; margin-top:2rem }
     #results h2 { color:#2c3e50; margin-bottom:1rem }
     #results ul { margin:0.5rem 0 1rem 1.2rem }
+    #analysis { background:#fefefe; border:1px solid #e1e4e8; border-radius:5px; padding:1.5rem; margin-top:1rem }
+    #analysis h3 { color:#2c3e50; margin-top:1rem }
+    #analysis p { margin:0.5rem 0 }
   </style>
 </head>
 <body>
@@ -25,8 +28,10 @@
   <form id="quizForm"></form>
   <button type="submit" form="quizForm">Submit & View Results</button>
   <div id="results"></div>
+  <div id="analysis"></div>
 
   <script>
+    // Full 80-item scenario question bank
     const questions = [
       {id:1,section:1,a:"Mid-meeting, someone suggests a radical shift—do you speak up immediately to debate it?",b:"Do you wait until after the meeting to send a carefully worded email with your thoughts?"},
       {id:2,section:1,a:"A neighbor at a block party strikes up a long conversation—do you keep chatting?",b:"Do you politely excuse yourself for some alone time?"},
@@ -110,6 +115,7 @@
       {id:80,section:4,a:"You long to leave a unique mark—do you craft your own path?",b:"Or build success as part of a cohesive team?"}
     ];
 
+    // Render questions
     const form = document.getElementById('quizForm');
     questions.forEach(q => {
       const div = document.createElement('div');
@@ -123,25 +129,189 @@
       form.appendChild(div);
     });
 
+    // Group by section
     const buckets = {1:[],2:[],3:[],4:[]};
     questions.forEach(q => buckets[q.section].push(q.id));
-    function getAns(id) { const el = document.querySelector(`input[name="q${id}"]:checked`); return el ? el.value : null; }
-    document.getElementById('quizForm').addEventListener('submit', e => {
+
+    function getAns(id) {
+      const el = document.querySelector(`input[name="q${id}"]:checked`);
+      return el ? el.value : null;
+    }
+
+    /**
+     * Given the `res` object (with big, ria, str, mot),
+     * returns HTML describing what those scores mean.
+     */
+    function renderAnalysis(res) {
+      let html = "";
+
+      // 1) Big Five Analysis
+      html += "<h3>🧠 Personality Analysis (Big Five)</h3>";
+
+      // Extraversion
+      if (res.big.E <= 1) {
+        html += `<p><strong>Extraversion:</strong> You scored very low (${res.big.E}/6). You likely prefer deep one-on-one conversations or quiet, focused work over group collaboration. Look for roles where you can work independently or mentor in small settings.</p>`;
+      } else if (res.big.E <= 3) {
+        html += `<p><strong>Extraversion:</strong> You have a moderate score (${res.big.E}/6). You enjoy social interaction in doses—team brainstorming is energizing, but you also appreciate solo time. You’ll shine in environments that let you balance group work with heads-down focus.</p>`;
+      } else {
+        html += `<p><strong>Extraversion:</strong> You scored high (${res.big.E}/6). You thrive when you can connect with people, lead discussions, and network. Look for roles that put you in front of teams, clients, or large groups.</p>`;
+      }
+
+      // Agreeableness
+      if (res.big.A <= 1) {
+        html += `<p><strong>Agreeableness:</strong> You scored very low (${res.big.A}/6). You’re direct, skeptical, and unafraid of conflict—ideal for roles where calling out issues quickly is critical. Just be mindful to frame feedback constructively so others stay on board.</p>`;
+      } else if (res.big.A <= 3) {
+        html += `<p><strong>Agreeableness:</strong> You have a moderate score (${res.big.A}/6). You can push back when necessary but also cooperate when needed. You’ll excel in teams that value honest feedback balanced with collaborative compromise.</p>`;
+      } else {
+        html += `<p><strong>Agreeableness:</strong> You scored high (${res.big.A}/6). You’re naturally empathetic and cooperative—everyone likes working with you. Consider roles like mediation, customer success, or any position that hinges on strong people skills.</p>`;
+      }
+
+      // Conscientiousness
+      if (res.big.C <= 1) {
+        html += `<p><strong>Conscientiousness:</strong> You scored very low (${res.big.C}/6). You prefer flexible or spontaneous workflows over rigid checklists. You’ll be most productive in roles with loose structure—like creative R&D or startup environments—where autonomy is valued.</p>`;
+      } else if (res.big.C <= 3) {
+        html += `<p><strong>Conscientiousness:</strong> You have a moderate score (${res.big.C}/6). You can follow plans when necessary but also adjust on the fly. A hybrid role (some structure mixed with creative freedom) will fit you best.</p>`;
+      } else {
+        html += `<p><strong>Conscientiousness:</strong> You scored high (${res.big.C}/6). You’re organized and reliable—deadlines don’t faze you. You’ll excel in project management, operations, or any detail-oriented position.</p>`;
+      }
+
+      // Neuroticism
+      if (res.big.N <= 1) {
+        html += `<p><strong>Neuroticism:</strong> You scored very low (${res.big.N}/6). You remain calm under pressure and rarely get flustered. Great for high-stakes environments where steady judgment is crucial.</p>`;
+      } else if (res.big.N <= 3) {
+        html += `<p><strong>Neuroticism:</strong> You have a moderate score (${res.big.N}/6). You experience some stress but generally cope well. A balanced work environment with occasional checkpoints is ideal.</p>`;
+      } else {
+        html += `<p><strong>Neuroticism:</strong> You scored high (${res.big.N}/6). You’re sensitive to pressure and may worry more than average. Seek roles that offer strong support systems, clear processes, and an emphasis on well-being.</p>`;
+      }
+
+      // Openness
+      if (res.big.O <= 1) {
+        html += `<p><strong>Openness:</strong> You scored very low (${res.big.O}/6). You prefer practical, proven methods over radical new ideas. Look for hands-on or technical roles where incremental improvement is valued.</p>`;
+      } else if (res.big.O <= 3) {
+        html += `<p><strong>Openness:</strong> You have a moderate score (${res.big.O}/6). You’ll try new things if there’s a clear purpose, but you won’t chase novelty for its own sake. Choose environments that balance tradition with occasional innovation.</p>`;
+      } else {
+        html += `<p><strong>Openness:</strong> You scored high (${res.big.O}/6). You love exploring new ideas and creative pursuits. Consider roles in design, R&D, or any position that asks you to think “outside the box.”</p>`;
+      }
+
+      // 2) RIASEC Analysis
+      html += "<h3>🎯 Career Interest Analysis (RIASEC)</h3>";
+      const sortedRIA = Object.entries(res.ria).sort((a,b)=>b[1]-a[1]);
+      const top1 = sortedRIA[0], top2 = sortedRIA[1];
+      html += `<p>Your highest RIASEC themes are <strong>${top1[0]}</strong> (${top1[1]}/3) and <strong>${top2[0]}</strong> (${top2[1]}/3).</p>`;
+
+      if (top1[0] === "R") {
+        html += `<p><strong>Realistic (R):</strong> You enjoy hands-on, practical tasks—working with tools, equipment, or coding directly. Seek roles that let you build, repair, or maintain tangible systems.</p>`;
+      }
+      if (top1[0] === "I") {
+        html += `<p><strong>Investigative (I):</strong> You love analyzing data, doing research, and solving puzzles. You’d thrive in environments where you decode complex problems (e.g., data science, UX research).</p>`;
+      }
+      if (top1[0] === "A") {
+        html += `<p><strong>Artistic (A):</strong> You crave creative freedom—design, writing, and visual expression. Look for positions where you can craft original work and influence the look/feel of a product or brand.</p>`;
+      }
+      if (top1[0] === "S") {
+        html += `<p><strong>Social (S):</strong> You’re energized by helping others learn, grow, or feel supported. Consider roles like teaching, counseling, or customer success.</p>`;
+      }
+      if (top1[0] === "E") {
+        html += `<p><strong>Enterprising (E):</strong> You enjoy leading, persuading, and making decisions. Ideal roles include sales leadership, project management, or any position that requires you to rally teams and drive results.</p>`;
+      }
+      if (top1[0] === "C") {
+        html += `<p><strong>Conventional (C):</strong> You prefer structure, organization, and clear procedures. Roles in accounting, administration, or data entry might suit you best.</p>`;
+      }
+
+      // 3) Strengths Orientation
+      html += "<h3>⚖️ Strengths Orientation</h3>";
+      if (res.str.A > res.str.B) {
+        html += `<p>You lean toward <strong>Innovation & Leadership (A)</strong> (${res.str.A} vs ${res.str.B}). You’re comfortable setting bold direction, brainstorming big ideas, and galvanizing people. Pair this with a role where you can both envision and articulate new paths to a team.</p>`;
+      } else if (res.str.A < res.str.B) {
+        html += `<p>You lean toward <strong>Execution & Support (B)</strong> (${res.str.B} vs ${res.str.A}). You’re energized by diving into details, supporting others behind the scenes, and ensuring things get done. Look for roles that value you as the “engine room” that keeps projects moving.</p>`;
+      } else {
+        html += `<p>Your Strengths are <strong>perfectly balanced</strong> (${res.str.A} vs ${res.str.B}). You can shift comfortably between big-picture vision and hands-on execution. Seek roles where you’ll need to both set direction and help carry out the details—like a product manager or small-team lead.</p>`;
+      }
+
+      // 4) Motivations
+      html += "<h3>🚀 Core Motivations</h3>";
+      if (res.mot.A > res.mot.B) {
+        html += `<p>You’re primarily driven by <strong>Vision & Transformation (A)</strong> (${res.mot.A} vs ${res.mot.B}). You want to create new solutions and inspire change. You’ll find fulfillment in environments that encourage bold innovation and let you be the “idea champion.”</p>`;
+      } else if (res.mot.A < res.mot.B) {
+        html += `<p>You’re more motivated by <strong>Stability & Support (B)</strong> (${res.mot.B} vs ${res.mot.A}). You derive purpose from steady, reliable systems and helping others succeed—consider roles in operations, HR, or any team-support function.</p>`;
+      } else {
+        html += `<p>Your Motivations are <strong>balanced</strong> (${res.mot.A} vs ${res.mot.B}). You value both driving innovation and maintaining reliable processes. Look for hybrid roles (like innovation ops or strategic program management) that let you do both.</p>`;
+      }
+
+      return html;
+    }
+
+    // Handle form submission, scoring, and display
+    document.getElementById('quizForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const res = {big:{E:0,A:0,C:0,N:0,O:0},ria:{R:0,I:0,A:0,S:0,E:0,C:0},str:{A:0,B:0},mot:{A:0,B:0}};
-      ["E","A","C","N","O"].forEach((d,i) => buckets[1].slice(i*6,(i+1)*6).forEach(id => { if(getAns(id)==="A") res.big[d]++; }));
-      ["R","I","A","S","E","C"].forEach((d,i) => buckets[2].slice(i*3,(i+1)*3).forEach(id => { if(getAns(id)==="A") res.ria[d]++; }));
-      buckets[3].forEach(id => { const v = getAns(id); if(v) res.str[v]++; });
-      buckets[4].forEach(id => { const v = getAns(id); if(v) res.mot[v]++; });
-      let out = "<h2>Your Results</h2><h3>Big Five</h3><ul>";
-      out += `<li>Extraversion: ${res.big.E}/6</li><li>Agreeableness: ${res.big.A}/6</li>`;
-      out += `<li>Conscientiousness: ${res.big.C}/6</li><li>Neuroticism: ${res.big.N}/6</li>`;
-      out += `<li>Openness: ${res.big.O}/6</li></ul><h3>Top RIASEC</h3><ul>`;
-      Object.entries(res.ria).sort((a,b) => b[1]-a[1]).slice(0,2).forEach(([k,v]) => out += `<li>${k}: ${v}/3</li>`);
-      out += "</ul><h3>Strengths</h3><p>A:" + res.str.A + " vs B:" + res.str.B + "</p>";
-      out += "<h3>Motivations</h3><p>A:" + res.mot.A + " vs B:" + res.mot.B + "</p>";
+
+      // Build the result object
+      const res = {
+        big: { E:0, A:0, C:0, N:0, O:0 },
+        ria: { R:0, I:0, A:0, S:0, E:0, C:0 },
+        str: { A:0, B:0 },
+        mot: { A:0, B:0 }
+      };
+
+      // Section 1 → Big Five: 5 dimensions × 6 questions each
+      ["E","A","C","N","O"].forEach((dim, i) => {
+        buckets[1].slice(i*6, (i+1)*6).forEach(id => {
+          if (getAns(id) === "A") res.big[dim]++;
+        });
+      });
+
+      // Section 2 → RIASEC: each 3 questions per letter
+      ["R","I","A","S","E","C"].forEach((dim, i) => {
+        buckets[2].slice(i*3, (i+1)*3).forEach(id => {
+          if (getAns(id) === "A") res.ria[dim]++;
+        });
+      });
+
+      // Section 3 → Strengths: count A vs B
+      buckets[3].forEach(id => {
+        const ans = getAns(id);
+        if (ans === "A") res.str.A++;
+        if (ans === "B") res.str.B++;
+      });
+
+      // Section 4 → Motivations: count A vs B
+      buckets[4].forEach(id => {
+        const ans = getAns(id);
+        if (ans === "A") res.mot.A++;
+        if (ans === "B") res.mot.B++;
+      });
+
+      // 1) Display numeric results
+      let out = `<h2>Your Results</h2>
+        <h3>Big Five</h3>
+        <ul>
+          <li>Extraversion: ${res.big.E}/6</li>
+          <li>Agreeableness: ${res.big.A}/6</li>
+          <li>Conscientiousness: ${res.big.C}/6</li>
+          <li>Neuroticism: ${res.big.N}/6</li>
+          <li>Openness: ${res.big.O}/6</li>
+        </ul>
+        <h3>Top RIASEC</h3>
+        <ul>`;
+      Object.entries(res.ria)
+        .sort((a,b) => b[1] - a[1])
+        .slice(0,2)
+        .forEach(([k,v]) => {
+          out += `<li>${k}: ${v}/3</li>`;
+        });
+      out += `</ul>
+        <h3>Strengths</h3>
+        <p>A: ${res.str.A} vs B: ${res.str.B}</p>
+        <h3>Motivations</h3>
+        <p>A: ${res.mot.A} vs B: ${res.mot.B}</p>`;
+
       document.getElementById('results').innerHTML = out;
-      window.scrollTo(0,document.body.scrollHeight);
+
+      // 2) Generate and display analysis
+      const analysisHTML = renderAnalysis(res);
+      document.getElementById('analysis').innerHTML = analysisHTML;
+
+      window.scrollTo(0, document.body.scrollHeight);
     });
   </script>
 </body>
