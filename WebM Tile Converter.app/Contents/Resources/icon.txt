@@ -1,0 +1,13 @@
+WebM Tile Converter
+===================
+
+A powerful tool to convert animations and videos 
+into custom-sized WebM tiles for Telegram emoji packs.
+
+Features:
+- Multiple input formats (PNG, SVG, WebP, GIF, MP4, etc.)
+- Automatic FPS detection
+- Custom tile sizing
+- High quality WebM output with transparency
+
+Double-click to run!

@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# WebM Tile Converter - Main App
+# This is the main executable for the WebM Tile Converter app
+
+# Get the directory where this app is located
+APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." &> /dev/null && pwd )"
+RESOURCES_DIR="${APP_DIR}/Contents/Resources"
+
+# Check if Python is available
+if ! command -v python3 &> /dev/null; then
+    osascript -e 'display alert "Error" message "Python 3 is not installed. Please install Python 3 from python.org"'
+    exit 1
+fi
+
+# Check if required Python packages are installed
+check_package() {
+    python3 -c "import $1" 2>/dev/null
+    return $?
+}
+
+missing_packages=()
+
+if ! check_package "PIL"; then
+    missing_packages+=("pillow")
+fi
+
+if ! check_package "imageio"; then
+    missing_packages+=("imageio[ffmpeg]")
+fi
+
+if ! check_package "numpy"; then
+    missing_packages+=("numpy")
+fi
+
+if ! check_package "tkinter"; then
+    osascript -e 'display alert "Error" message "Tkinter is not available. Please install Python with Tkinter support."'
+    exit 1
+fi
+
+# Install missing packages if any
+if [ ${#missing_packages[@]} -ne 0 ]; then
+    echo "Installing missing packages: ${missing_packages[*]}"
+    for package in "${missing_packages[@]}"; do
+        python3 -m pip install "$package" --user
+    done
+fi
+
+# Check if FFmpeg is available
+if ! command -v ffmpeg &> /dev/null; then
+    # Try to install FFmpeg using Homebrew
+    if command -v brew &> /dev/null; then
+        echo "Installing FFmpeg using Homebrew..."
+        brew install ffmpeg
+    else
+        osascript -e 'display alert "Error" message "FFmpeg is not installed. Please install FFmpeg from ffmpeg.org or install Homebrew and run: brew install ffmpeg"'
+        exit 1
+    fi
+fi
+
+# Get the script directory (where the Python script is located)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." &> /dev/null && pwd )"
+PYTHON_SCRIPT="${RESOURCES_DIR}/png_sequence_to_webm_tiles.py"
+
+# Check if the Python script exists
+if [ ! -f "$PYTHON_SCRIPT" ]; then
+    osascript -e 'display alert "Error" message "Could not find the main Python script. Please ensure the app bundle is complete."'
+    exit 1
+fi
+
+# Run the Python script
+cd "$RESOURCES_DIR"
+python3 "$PYTHON_SCRIPT"
+
+# Check if the script ran successfully
+if [ $? -ne 0 ]; then
+    osascript -e 'display alert "Error" message "The WebM Tile Converter encountered an error. Please check the terminal output for details."'
+fi
