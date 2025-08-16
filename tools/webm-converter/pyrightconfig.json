@@ -1,0 +1,21 @@
+{
+	"venvPath": "/workspace/tools/webm-converter",
+	"venv": ".venv",
+	"pythonVersion": "3.13",
+	"pythonPlatform": "Linux",
+	"typeCheckingMode": "standard",
+	"reportMissingImports": "warning",
+	"include": [
+		"."
+	],
+	"exclude": [
+		"**/__pycache__",
+		".venv",
+		".venv/**",
+		"**/.venv/**",
+		"WebM Tile Converter.app",
+		"WebM_Tile_Converter_Distribution",
+		"WebM_Tile_Converter_Distribution/**",
+		"WebM Tile Converter.app/**"
+	]
+}

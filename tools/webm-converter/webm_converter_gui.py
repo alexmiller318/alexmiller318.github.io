@@ -73,7 +73,7 @@ class WebMTileConverterGUI:
         """Create all GUI widgets"""
         # Main container
         main_frame = ttk.Frame(self.root, padding="20")
-        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        main_frame.grid(row=0, column=0, sticky="nsew")
         
         # Configure grid weights
         self.root.columnconfigure(0, weight=1)
@@ -106,7 +106,7 @@ class WebMTileConverterGUI:
         """Create input file/folder selection section"""
         # Input frame
         input_frame = ttk.LabelFrame(parent, text="📁 Input File or Folder", padding="15")
-        input_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 20))
+        input_frame.grid(row=row, column=0, columnspan=3, sticky="ew", pady=(0, 20))
         input_frame.columnconfigure(1, weight=1)
         
         # File selection
@@ -114,11 +114,11 @@ class WebMTileConverterGUI:
         
         # Input path display
         self.input_path_label = ttk.Label(input_frame, textvariable=self.input_path, style='Info.TLabel', wraplength=500)
-        self.input_path_label.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+        self.input_path_label.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(0, 10))
         
         # Browse buttons
         button_frame = ttk.Frame(input_frame)
-        button_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E))
+        button_frame.grid(row=2, column=0, columnspan=3, sticky="ew")
         
         ttk.Button(button_frame, text="📄 Select File", command=self.browse_file, style='Primary.TButton').pack(side=tk.LEFT, padx=(0, 10))
         ttk.Button(button_frame, text="📁 Select Folder", command=self.browse_folder, style='Primary.TButton').pack(side=tk.LEFT)
@@ -130,14 +130,14 @@ class WebMTileConverterGUI:
     def create_settings_section(self, parent, row):
         """Create settings section"""
         settings_frame = ttk.LabelFrame(parent, text="⚙️ Settings", padding="15")
-        settings_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 20))
+        settings_frame.grid(row=row, column=0, columnspan=3, sticky="ew", pady=(0, 20))
         settings_frame.columnconfigure(1, weight=1)
         
         # Frame duration
         ttk.Label(settings_frame, text="Frame Duration:", style='Header.TLabel').grid(row=0, column=0, sticky=tk.W, pady=(0, 5))
         
         duration_frame = ttk.Frame(settings_frame)
-        duration_frame.grid(row=1, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 15))
+        duration_frame.grid(row=1, column=0, columnspan=3, sticky="ew", pady=(0, 15))
         
         self.detected_fps_label = ttk.Label(duration_frame, text="", style='Success.TLabel')
         self.detected_fps_label.pack(side=tk.LEFT, padx=(0, 10))
@@ -153,7 +153,7 @@ class WebMTileConverterGUI:
         ttk.Label(settings_frame, text="Tile Size:", style='Header.TLabel').grid(row=2, column=0, sticky=tk.W, pady=(0, 5))
         
         tile_frame = ttk.Frame(settings_frame)
-        tile_frame.grid(row=3, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 15))
+        tile_frame.grid(row=3, column=0, columnspan=3, sticky="ew", pady=(0, 15))
         
         ttk.Label(tile_frame, text="Width:").pack(side=tk.LEFT, padx=(0, 5))
         width_spinbox = ttk.Spinbox(tile_frame, from_=32, to=2048, textvariable=self.tile_width, width=10)
@@ -170,7 +170,7 @@ class WebMTileConverterGUI:
         ttk.Label(settings_frame, text="Quick Presets:", style='Header.TLabel').grid(row=4, column=0, sticky=tk.W, pady=(0, 5))
         
         preset_frame = ttk.Frame(settings_frame)
-        preset_frame.grid(row=5, column=0, columnspan=3, sticky=(tk.W, tk.E))
+        preset_frame.grid(row=5, column=0, columnspan=3, sticky="ew")
         
         ttk.Button(preset_frame, text="Telegram (512x512)", command=lambda: self.set_preset(512, 512), style='Secondary.TButton').pack(side=tk.LEFT, padx=(0, 10))
         ttk.Button(preset_frame, text="Small (256x256)", command=lambda: self.set_preset(256, 256), style='Secondary.TButton').pack(side=tk.LEFT, padx=(0, 10))
@@ -184,13 +184,13 @@ class WebMTileConverterGUI:
     def create_output_section(self, parent, row):
         """Create output section"""
         output_frame = ttk.LabelFrame(parent, text="📤 Output", padding="15")
-        output_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 20))
+        output_frame.grid(row=row, column=0, columnspan=3, sticky="ew", pady=(0, 20))
         output_frame.columnconfigure(1, weight=1)
         
         ttk.Label(output_frame, text="Output folder:", style='Header.TLabel').grid(row=0, column=0, sticky=tk.W, pady=(0, 5))
         
         self.output_path_label = ttk.Label(output_frame, textvariable=self.output_folder, style='Info.TLabel', wraplength=500)
-        self.output_path_label.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+        self.output_path_label.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(0, 10))
         
         ttk.Button(output_frame, text="📁 Choose Folder", command=self.browse_output_folder, style='Secondary.TButton').grid(row=2, column=0, sticky=tk.W)
         
@@ -201,17 +201,17 @@ class WebMTileConverterGUI:
     def create_progress_section(self, parent, row):
         """Create progress section"""
         progress_frame = ttk.LabelFrame(parent, text="📊 Progress", padding="15")
-        progress_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 20))
+        progress_frame.grid(row=row, column=0, columnspan=3, sticky="ew", pady=(0, 20))
         progress_frame.columnconfigure(0, weight=1)
         
         # Progress bar
         self.progress_var = tk.DoubleVar()
         self.progress_bar = ttk.Progressbar(progress_frame, variable=self.progress_var, maximum=100)
-        self.progress_bar.grid(row=0, column=0, sticky=(tk.W, tk.E), pady=(0, 10))
+        self.progress_bar.grid(row=0, column=0, sticky="ew", pady=(0, 10))
         
         # Progress text
         self.progress_text = ScrolledText(progress_frame, height=8, width=70, font=('Monaco', 9))
-        self.progress_text.grid(row=1, column=0, sticky=(tk.W, tk.E))
+        self.progress_text.grid(row=1, column=0, sticky="ew")
         
         # Status label
         self.status_label = ttk.Label(progress_frame, text="Ready to convert", style='Info.TLabel')
