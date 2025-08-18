@@ -151,7 +151,7 @@ def load_frames_and_durations(path):
         try:
             with iio.imopen(path, 'r') as rdr:
                 try:
-                    n = rdr.get_length()
+                    n = len(rdr)  # type: ignore[reportUnknownArgumentType]
                 except Exception:
                     n = len(frames)
                 for i in range(n):

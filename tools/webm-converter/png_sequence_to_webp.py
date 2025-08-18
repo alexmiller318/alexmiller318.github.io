@@ -142,10 +142,10 @@ def convert_sequence_to_mp4(png_files, frame_duration, output_path):
     
     # Create temporary directory for PNG files
     temp_dir = tempfile.mkdtemp()
+    temp_png_files = []
     
     try:
         # Copy PNG files to temp directory with sequential naming
-        temp_png_files = []
         for i, png_file in enumerate(png_files):
             temp_png_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
             with Image.open(png_file) as img:

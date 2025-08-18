@@ -114,7 +114,7 @@ class WebMTileConverterGUI:
         """Create all GUI widgets"""
         # Main container
         main_frame = ttk.Frame(self.scrollable_frame, padding="20")
-        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        main_frame.grid(row=0, column=0, sticky="nsew")
         
         # Configure grid weights
         self.scrollable_frame.columnconfigure(0, weight=1)
@@ -146,7 +146,7 @@ class WebMTileConverterGUI:
         """Create input file/folder selection section"""
         # Input frame
         input_frame = ttk.LabelFrame(parent, text="📁 Input File or Folder", padding="15")
-        input_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 20))
+        input_frame.grid(row=row, column=0, columnspan=3, sticky="ew", pady=(0, 20))
         input_frame.columnconfigure(1, weight=1)
         
         # File selection
@@ -154,11 +154,11 @@ class WebMTileConverterGUI:
         
         # Input path display
         self.input_path_label = ttk.Label(input_frame, textvariable=self.input_path, style='Info.TLabel', wraplength=600)
-        self.input_path_label.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+        self.input_path_label.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(0, 10))
         
         # Browse buttons
         button_frame = ttk.Frame(input_frame)
-        button_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E))
+        button_frame.grid(row=2, column=0, columnspan=3, sticky="ew")
         
         ttk.Button(button_frame, text="📄 Select File", command=self.browse_file, style='Primary.TButton').pack(side=tk.LEFT, padx=(0, 10))
         ttk.Button(button_frame, text="📁 Select Folder", command=self.browse_folder, style='Primary.TButton').pack(side=tk.LEFT)
@@ -167,11 +167,11 @@ class WebMTileConverterGUI:
         ttk.Label(input_frame, text="Or enter path manually:", style='Header.TLabel').grid(row=3, column=0, sticky=tk.W, pady=(20, 5))
         
         manual_frame = ttk.Frame(input_frame)
-        manual_frame.grid(row=4, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 10))
+        manual_frame.grid(row=4, column=0, columnspan=3, sticky="ew", pady=(0, 10))
         manual_frame.columnconfigure(0, weight=1)
         
         self.manual_path_entry = ttk.Entry(manual_frame, textvariable=self.input_path, width=60)
-        self.manual_path_entry.grid(row=0, column=0, sticky=(tk.W, tk.E), padx=(0, 10))
+        self.manual_path_entry.grid(row=0, column=0, sticky="ew", padx=(0, 10))
         
         ttk.Button(manual_frame, text="Set", command=self.set_manual_path, style='Secondary.TButton').grid(row=0, column=1)
         
@@ -182,7 +182,7 @@ class WebMTileConverterGUI:
     def create_settings_section(self, parent, row):
         """Create settings section"""
         settings_frame = ttk.LabelFrame(parent, text="⚙️ Settings", padding="15")
-        settings_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 20))
+        settings_frame.grid(row=row, column=0, columnspan=3, sticky="ew", pady=(0, 20))
         settings_frame.columnconfigure(1, weight=1)
         
         # Frame rate / Duration section
@@ -194,7 +194,7 @@ class WebMTileConverterGUI:
         
         # FPS/Duration mode selection
         mode_frame = ttk.Frame(settings_frame)
-        mode_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 15))
+        mode_frame.grid(row=2, column=0, columnspan=3, sticky="ew", pady=(0, 15))
         
         ttk.Radiobutton(mode_frame, text="Frame Rate (FPS)", variable=self.fps_mode, value="fps", 
                        command=self.update_fps_duration_mode).pack(side=tk.LEFT, padx=(0, 20))
@@ -203,15 +203,15 @@ class WebMTileConverterGUI:
         
         # FPS selection frame
         self.fps_frame = ttk.Frame(settings_frame)
-        self.fps_frame.grid(row=3, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 15))
+        self.fps_frame.grid(row=3, column=0, columnspan=3, sticky="ew", pady=(0, 15))
         
         ttk.Label(self.fps_frame, text="FPS:").pack(side=tk.LEFT, padx=(0, 5))
         
         # Common FPS values
-        fps_values = [5.0, 10.0, 15.0, 24.0, 25.0, 30.0, 50.0, 60.0, 120.0]
+        fps_values = ["5.0", "10.0", "15.0", "24.0", "25.0", "30.0", "50.0", "60.0", "120.0"]
         self.fps_combobox = ttk.Combobox(self.fps_frame, values=fps_values, textvariable=self.selected_fps, width=10)
         self.fps_combobox.pack(side=tk.LEFT, padx=(0, 10))
-        self.fps_combobox.set(5.0)
+        self.fps_combobox.set("5.0")
         
         # Custom FPS entry
         ttk.Label(self.fps_frame, text="or custom:").pack(side=tk.LEFT, padx=(0, 5))
@@ -224,7 +224,7 @@ class WebMTileConverterGUI:
         
         # Duration selection frame
         self.duration_frame = ttk.Frame(settings_frame)
-        self.duration_frame.grid(row=4, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 15))
+        self.duration_frame.grid(row=4, column=0, columnspan=3, sticky="ew", pady=(0, 15))
         
         ttk.Label(self.duration_frame, text="Duration (ms):").pack(side=tk.LEFT, padx=(0, 5))
         
@@ -246,7 +246,7 @@ class WebMTileConverterGUI:
         ttk.Label(settings_frame, text="Tile Size:", style='Header.TLabel').grid(row=5, column=0, sticky=tk.W, pady=(0, 5))
         
         tile_frame = ttk.Frame(settings_frame)
-        tile_frame.grid(row=6, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 15))
+        tile_frame.grid(row=6, column=0, columnspan=3, sticky="ew", pady=(0, 15))
         
         ttk.Label(tile_frame, text="Width:").pack(side=tk.LEFT, padx=(0, 5))
         width_spinbox = ttk.Spinbox(tile_frame, from_=32, to=2048, textvariable=self.tile_width, width=10)
@@ -263,7 +263,7 @@ class WebMTileConverterGUI:
         ttk.Label(settings_frame, text="Quick Presets:", style='Header.TLabel').grid(row=7, column=0, sticky=tk.W, pady=(0, 5))
         
         preset_frame = ttk.Frame(settings_frame)
-        preset_frame.grid(row=8, column=0, columnspan=3, sticky=(tk.W, tk.E))
+        preset_frame.grid(row=8, column=0, columnspan=3, sticky="ew")
         
         ttk.Button(preset_frame, text="Telegram (100x100)", command=lambda: self.set_preset(100, 100), style='Secondary.TButton').pack(side=tk.LEFT, padx=(0, 10))
         ttk.Button(preset_frame, text="Small (64x64)", command=lambda: self.set_preset(64, 64), style='Secondary.TButton').pack(side=tk.LEFT, padx=(0, 10))
@@ -283,13 +283,13 @@ class WebMTileConverterGUI:
     def create_output_section(self, parent, row):
         """Create output section"""
         output_frame = ttk.LabelFrame(parent, text="📤 Output", padding="15")
-        output_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 20))
+        output_frame.grid(row=row, column=0, columnspan=3, sticky="ew", pady=(0, 20))
         output_frame.columnconfigure(1, weight=1)
         
         ttk.Label(output_frame, text="Output folder:", style='Header.TLabel').grid(row=0, column=0, sticky=tk.W, pady=(0, 5))
         
         self.output_path_label = ttk.Label(output_frame, textvariable=self.output_folder, style='Info.TLabel', wraplength=600)
-        self.output_path_label.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+        self.output_path_label.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(0, 10))
         
         ttk.Button(output_frame, text="📁 Choose Folder", command=self.browse_output_folder, style='Secondary.TButton').grid(row=2, column=0, sticky=tk.W)
         
@@ -300,17 +300,17 @@ class WebMTileConverterGUI:
     def create_progress_section(self, parent, row):
         """Create progress section"""
         progress_frame = ttk.LabelFrame(parent, text="📊 Progress", padding="15")
-        progress_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 20))
+        progress_frame.grid(row=row, column=0, columnspan=3, sticky="ew", pady=(0, 20))
         progress_frame.columnconfigure(0, weight=1)
         
         # Progress bar
         self.progress_var = tk.DoubleVar()
         self.progress_bar = ttk.Progressbar(progress_frame, variable=self.progress_var, maximum=100)
-        self.progress_bar.grid(row=0, column=0, sticky=(tk.W, tk.E), pady=(0, 10))
+        self.progress_bar.grid(row=0, column=0, sticky="ew", pady=(0, 10))
         
         # Progress text
         self.progress_text = ScrolledText(progress_frame, height=10, width=80, font=('Monaco', 9))
-        self.progress_text.grid(row=1, column=0, sticky=(tk.W, tk.E))
+        self.progress_text.grid(row=1, column=0, sticky="ew")
         
         # Status label
         self.status_label = ttk.Label(progress_frame, text="Ready to convert", style='Info.TLabel')
@@ -651,11 +651,18 @@ class WebMTileConverterGUI:
             # Get frame duration based on mode
             if self.fps_mode.get() == "fps":
                 fps = self.selected_fps.get()
+                try:
+                    fps = float(fps)
+                except Exception:
+                    fps = 5.0
                 duration = int(1000 / fps)
                 self.log_message(f"FPS: {fps} (Duration: {duration}ms)")
             else:
                 duration = self.frame_duration.get()
-                fps = 1000 / duration
+                try:
+                    fps = 1000 / float(duration)
+                except Exception:
+                    fps = 5.0
                 self.log_message(f"Duration: {duration}ms (FPS: {fps:.1f})")
             
             # Perform the actual conversion
@@ -685,6 +692,10 @@ class WebMTileConverterGUI:
             # Get frame duration
             if self.fps_mode.get() == "fps":
                 fps = self.selected_fps.get()
+                try:
+                    fps = float(fps)
+                except Exception:
+                    fps = 5.0
                 frame_duration = int(1000 / fps)
             else:
                 frame_duration = self.frame_duration.get()
@@ -811,10 +822,10 @@ class WebMTileConverterGUI:
                     cropped_frames = []
                     for frame in frames:
                         # Ensure we don't go out of bounds
-                        crop_x = min(x, width - tile_width)
-                        crop_y = min(y, height - tile_height)
-                        crop_w = min(tile_width, width - crop_x)
-                        crop_h = min(tile_height, height - crop_y)
+                        crop_x = max(0, min(x, width - tile_width))
+                        crop_y = max(0, min(y, height - tile_height))
+                        crop_w = max(0, min(tile_width, width - crop_x))
+                        crop_h = max(0, min(tile_height, height - crop_y))
                         
                         cropped = frame[crop_y:crop_y+crop_h, crop_x:crop_x+crop_w]
                         cropped_frames.append(cropped)
@@ -823,7 +834,7 @@ class WebMTileConverterGUI:
                     out_name = f"{base_name}_tile_{row+1}x{col+1}.webm"
                     out_path = os.path.join(out_folder, out_name)
                     
-                    success = self.save_frames_as_webm(cropped_frames, out_path, fps, tile_width, tile_height)
+                    success = self.save_frames_as_webm(cropped_frames, out_path, float(self.selected_fps.get()) if self.fps_mode.get()=="fps" else (1000/float(self.frame_duration.get() or 200)), tile_width, tile_height)
                     if success:
                         self.log_message(f"✅ Created {out_name}")
                     else:
