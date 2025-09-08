@@ -43,6 +43,7 @@ import math
 import tempfile
 import shutil
 import subprocess
+import argparse
 from PIL import Image
 import imageio.v3 as iio
 import numpy as np
@@ -621,53 +622,92 @@ def get_tile_name(base, row, col):
 def main():
     print("=== Universal Animation to Custom Size WebM Tiles ===")
     print("Supports: PNG sequences, SVG sequences, WebP, GIF, MP4, AVI, MOV, WebM, and more!\n")
-    
-    # Select input file or folder FIRST
-    input_path, input_type = select_input()
-    
+
+    parser = argparse.ArgumentParser(description="Convert animations to tiled WebM files")
+    parser.add_argument("--input", dest="input_path", help="Path to input file or folder", default=None)
+    parser.add_argument("--input-type", choices=["file", "folder"], dest="input_type", help="Specify input type if ambiguous", default=None)
+    parser.add_argument("--tile-width", type=int, dest="tile_width", help="Tile width in pixels", default=None)
+    parser.add_argument("--tile-height", type=int, dest="tile_height", help="Tile height in pixels", default=None)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--fps", type=float, dest="fps", help="Frames per second for output", default=None)
+    group.add_argument("--frame-duration", type=int, dest="frame_duration", help="Frame duration in ms for output", default=None)
+    parser.add_argument("--output-dir", dest="output_dir", help="Directory to place output tiles", default=None)
+    parser.add_argument("--force", action="store_true", help="Do not prompt when grid is 1xN or Nx1")
+    args = parser.parse_args()
+
+    # Determine input
+    if args.input_path:
+        input_path = args.input_path
+        if args.input_type:
+            input_type = args.input_type
+        else:
+            if os.path.isdir(input_path):
+                input_type = "folder"
+            elif os.path.isfile(input_path):
+                input_type = "file"
+            else:
+                print("Input path does not exist. Exiting.")
+                sys.exit(1)
+    else:
+        input_path, input_type = select_input()
+
     # Convert to PNG sequence if needed
     png_files, temp_dir = convert_to_png_sequence(input_path, input_type)
     if png_files is None:
         print("Failed to convert input to PNG sequence. Exiting.")
         sys.exit(1)
-    
+
     # Validate images
     if not validate_images(png_files):
         print("Image validation failed. Exiting.")
         sys.exit(1)
-    
+
     # Load all PNG files as frames to get dimensions
     frames = load_png_sequence(png_files)
     if frames is None:
         print("Failed to load PNG sequence. Exiting.")
         sys.exit(1)
-    
+
     # Get dimensions from the first frame (numpy shape is height, width, channels)
     height, width = frames[0].shape[:2]
     print(f"\nLoaded sequence: {len(frames)} frames, {width}x{height} pixels")
-    
+
     # Debug: Check the actual shape
     print(f"Debug: First frame shape: {frames[0].shape}")
     print(f"Debug: Interpreting as width={width}, height={height}")
-    
-    # Detect FPS from source file if possible, then get frame duration
+
+    # Determine FPS or frame duration
     detected_fps = None
     if input_type == "file":
-        detected_fps = detect_fps_from_file(input_path)
-    
-    # NOW get frame duration from user (with context about the sequence)
-    frame_duration = get_frame_duration(detected_fps)
-    
-    # NOW get tile dimensions from user (with context about the sequence)
-    tile_width, tile_height = get_tile_dimensions(width, height)
-    
+        try:
+            detected_fps = detect_fps_from_file(input_path)
+        except Exception:
+            detected_fps = None
+
+    if args.frame_duration is not None:
+        frame_duration = args.frame_duration
+    elif args.fps is not None:
+        if args.fps <= 0:
+            print("FPS must be positive. Exiting.")
+            sys.exit(1)
+        frame_duration = int(round(1000.0 / float(args.fps)))
+    else:
+        frame_duration = get_frame_duration(detected_fps)
+
+    # Tile size
+    if args.tile_width is not None and args.tile_height is not None:
+        tile_width = int(args.tile_width)
+        tile_height = int(args.tile_height)
+    else:
+        tile_width, tile_height = get_tile_dimensions(width, height)
+
     # Calculate grid dimensions
     n_rows = math.ceil(height / tile_height)
     n_cols = math.ceil(width / tile_width)
-    fps = 1000 / frame_duration
-    
+    fps = 1000 / float(frame_duration)
+
     print(f"\nProcessing {n_rows}x{n_cols} grid of {tile_width}x{tile_height} tiles...")
-    
+
     # Warn about unusual grid layouts
     if n_cols == 1 and n_rows > 1:
         print(f"⚠️  Note: Your animation is very narrow ({width}px wide). With {tile_width}px tiles, you'll get only 1 column.")
@@ -678,50 +718,54 @@ def main():
     elif n_cols == 1 and n_rows == 1:
         print(f"⚠️  Note: Your tile size ({tile_width}x{tile_height}) is larger than the animation ({width}x{height}).")
         print(f"   The entire animation will be scaled to fit in a single tile.")
-    
+
     # Ask user if they want to continue or adjust tile size
-    if n_cols == 1 or n_rows == 1:
+    if (n_cols == 1 or n_rows == 1) and not args.force:
         response = input("\nContinue with current tile size? (y/n): ").lower().strip()
         if response != 'y':
             print("Please run the script again with different tile dimensions.")
             sys.exit(0)
-    
+
     # Prepare output folder
     if input_type == "file":
         base_name = os.path.splitext(os.path.basename(input_path))[0]
     else:
         base_name = os.path.basename(input_path)
-    
+
     now_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    out_folder = f"/Users/alexmiller/Desktop/WEBM/{base_name}_{now_str}"
+    if args.output_dir:
+        out_folder = os.path.join(args.output_dir, f"{base_name}_{now_str}")
+    else:
+        default_root = os.path.join(os.getcwd(), "output")
+        out_folder = os.path.join(default_root, f"{base_name}_{now_str}")
     os.makedirs(out_folder, exist_ok=True)
-    
+
     # Process each tile
     for row in range(n_rows):
         for col in range(n_cols):
             x = col * tile_width
             y = row * tile_height
-            
+
             print(f"Creating tile {row+1}x{col+1}: {get_tile_name(base_name, row, col)}")
-            
+
             # Crop frames for this tile
             cropped = crop_frames(frames, x, y, tile_width, tile_height)
-            
+
             # Save as WebM
             out_name = get_tile_name(base_name, row, col)
             out_path = os.path.join(out_folder, out_name)
-            
+
             success = save_frames_as_webm(cropped, out_path, fps, tile_width, tile_height)
             if not success:
                 print(f"Failed to create tile {out_name}")
-    
+
     # Clean up temporary directory if it was created
     if temp_dir and os.path.exists(temp_dir):
         try:
             shutil.rmtree(temp_dir, ignore_errors=True)
         except:
             pass  # Don't fail if cleanup doesn't work
-    
+
     print(f"\n✅ All tiles saved to: {out_folder}")
 
 if __name__ == "__main__":
